@@ -1,0 +1,9 @@
+spring.application.name=name
+server.port=port
+springdoc.swagger-ui.path=/swagger-ui.html
+
+spring.security.user.name=name
+spring.security.user.password=password
+
+auth0.audience=https://audience.us.auth0.com/api/v2/
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://issuer-uri.us.auth0.com/
