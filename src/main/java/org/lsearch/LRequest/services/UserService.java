@@ -19,4 +19,8 @@ public class UserService {
     public void printName(User user) {
         log.info(user.getName());
     }
+
+    public void register(String providerId) {
+        // register user here
+    }
 }

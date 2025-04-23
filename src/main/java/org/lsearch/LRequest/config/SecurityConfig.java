@@ -21,7 +21,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/public",
             "/swagger-ui.html",
-            "/swagger-ui/index.html"
+            "/swagger-ui/**",
+            "/v3/api-docs*/**"
     };
 
     @Value("${auth0.audience}")
@@ -40,8 +41,10 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> {
                     requests
+                            .requestMatchers("/error").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/**").authenticated();
+                    // .requestMatchers("/**").permitAll();
                 })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()))

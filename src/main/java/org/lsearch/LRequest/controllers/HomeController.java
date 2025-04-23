@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 @Slf4j
 @RestController
+@RequestMapping("")
 @Validated
 public class HomeController {
 
@@ -52,6 +53,7 @@ public class HomeController {
         User user = new User();
         user.setName(name);
         user.setRole(UserRole.ADMIN);
+
         return user;
     }
 
@@ -68,7 +70,8 @@ public class HomeController {
 
     @GetMapping("/public")
     public ResponseEntity<String> publicEndpoint() {
-        return ResponseEntity.ok("Public Endpoint Working fine !");
+        throw new RuntimeException("Test");
+        // return ResponseEntity.ok("Public Endpoint Working fine !");
     }
 
     @GetMapping("/private")
