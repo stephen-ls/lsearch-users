@@ -1,9 +1,11 @@
 package org.lsearch.LRequest.utils;
 
 import lombok.RequiredArgsConstructor;
-import org.lsearch.LRequest.enums.UserRole;
+import org.lsearch.LRequest.exceptions.ResourceNotFoundException;
+import org.lsearch.LRequest.exceptions.UnauthenticatedException;
 import org.lsearch.LRequest.interfaces.CurrentUser;
 import org.lsearch.LRequest.models.User;
+import org.lsearch.LRequest.repositories.UserRepository;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,18 +16,11 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.*;
 
-import java.util.UUID;
-
 @Component
-// Uncommenting this allows to skip constructor
-// @RequiredArgsConstructor
+@RequiredArgsConstructor
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    // private final UserRepository userRepository;
-
-    public CurrentUserArgumentResolver(/*UserRepository userRepository*/) {
-        // this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -43,16 +38,14 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
         Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal == null) {
-            throw new RuntimeException("Unauthenticated");
+            throw new UnauthenticatedException("Unauthenticated");
         }
 
         String providerId = principal.getSubject();
-
-        var user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setProviderId(providerId);
-        user.setName("Artem");
-        user.setRole(UserRole.USER);
+        var user = userRepository.getUserByProviderId(providerId);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
 
         return user;
     }

@@ -31,7 +31,6 @@ public class AuthAspect {
     public void authenticate(ProceedingJoinPoint joinPoint) throws Throwable {
         Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var subject = principal.getSubject();
-        System.out.println(subject);
 
         this.user = new User();
         user.setName("Artem");
