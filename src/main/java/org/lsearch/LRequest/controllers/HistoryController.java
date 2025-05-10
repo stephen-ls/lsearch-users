@@ -19,31 +19,17 @@ import java.util.Objects;
 
 @Slf4j
 @RestController
-@RequestMapping("user")
+@RequestMapping("history")
 @Validated
 @RequiredArgsConstructor
-public class UserController {
+public class HistoryController {
 
     @Value("${auth0.webhook.key}")
     private String webhookKey;
     private final UserService userService;
 
-    @GetMapping("/me")
-    public User getProfile(@CurrentUser User user) {
+    @GetMapping("/list")
+    public User getUserHistory(@CurrentUser User user) {
         return user;
-    }
-
-    @PostMapping("/register")
-    public void register(@RequestBody @Valid RegisterUserDto userDto, Errors errors) throws BadRequestException {
-        if (errors.hasErrors()) {
-            var output = errors.getAllErrors().stream().map(item -> item.getDefaultMessage()).toArray();
-            throw new BadRequestException("There are some errors: " + Arrays.toString(output));
-        }
-
-        if (!Objects.equals(userDto.getAuth0Key(), this.webhookKey)) {
-            throw new BadCredentialsException("Webhook key is missing");
-        }
-
-        this.userService.register(userDto);
     }
 }

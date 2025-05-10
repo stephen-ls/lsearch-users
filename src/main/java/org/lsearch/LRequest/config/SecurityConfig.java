@@ -2,6 +2,7 @@ package org.lsearch.LRequest.config;
 
 import org.lsearch.LRequest.utils.AudienceValidator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -19,10 +20,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/public",
             "/swagger-ui.html",
             "/swagger-ui/**",
-            "/v3/api-docs*/**"
+            "/v3/api-docs*/**",
+            "/user/register",
     };
 
     @Value("${auth0.audience}")
@@ -43,12 +44,15 @@ public class SecurityConfig {
                     requests
                             .requestMatchers("/error").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
+                            .requestMatchers(PathRequest.toH2Console()).permitAll()
                             .requestMatchers("/**").authenticated();
-                    // .requestMatchers("/**").permitAll();
                 })
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder()))
                 );
+
+        http.headers(headersConfigurer -> headersConfigurer
+                .frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()));
 
         return (SecurityFilterChain) http.build();
     }

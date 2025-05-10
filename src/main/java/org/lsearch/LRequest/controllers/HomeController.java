@@ -63,7 +63,6 @@ public class HomeController {
             var output = errors.getAllErrors().stream().map(item -> item.getDefaultMessage()).toArray();
             throw new BadRequestException("There are some errors: " + Arrays.toString(output));
         } else {
-            userService.printName(user);
             return user;
         }
     }
@@ -72,22 +71,5 @@ public class HomeController {
     public ResponseEntity<String> publicEndpoint() {
         throw new RuntimeException("Test");
         // return ResponseEntity.ok("Public Endpoint Working fine !");
-    }
-
-    @GetMapping("/private")
-    public User privateEndpoint(@CurrentUser User user) {
-//        var claims = principal.getClaims();
-//        System.out.println(claims);
-//        Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        System.out.println(principal.getClaims());
-//        System.out.println(principal.getTokenValue());
-//        System.out.println(principal.getIssuer());
-//        System.out.println(principal.getSubject());
-//        if (principal instanceof AuthenticatedPrincipal user) {
-//
-//        }
-
-
-        return user;
     }
 }
