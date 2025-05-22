@@ -2,6 +2,8 @@ package org.lsearch.LRequest.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
+import org.lsearch.LRequest.dto.user.PatchUserDto;
 import org.lsearch.LRequest.dto.user.RegisterUserDto;
 import org.lsearch.LRequest.enums.UserRole;
 import org.lsearch.LRequest.models.User;
@@ -11,6 +13,7 @@ import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.annotation.SessionScope;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -87,10 +90,22 @@ public class UserService {
         var providerId = userDto.getProviderId();
         var user = userRepository.getUserByProviderId(providerId);
         if (user == null) {
-            int result = userRepository.createUser(providerId, getRandomName(), userDto.getEmail(), UserRole.USER);
+            user = new User();
+            user.setName(getRandomName());
+            user.setProviderId(providerId);
+            user.setEmail(userDto.getEmail());
+            user.setRole(UserRole.USER);
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
+            int result = userRepository.createUser(user);
             return result > 0;
         }
 
         return true;
+    }
+
+    public boolean updateUser(int id, PatchUserDto userDto) {
+        int result = userRepository.updateUser(id, userDto.getName(), userDto.getEmail());
+        return result > 0;
     }
 }

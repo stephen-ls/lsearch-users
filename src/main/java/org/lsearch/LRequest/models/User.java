@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.lsearch.LRequest.enums.UserRole;
 
+import java.util.Date;
+
 @Data
 public class User extends BaseEntity {
 
