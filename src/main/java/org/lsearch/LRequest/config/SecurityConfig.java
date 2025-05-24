@@ -43,7 +43,7 @@ public class SecurityConfig {
                     requests
                             .requestMatchers("/error").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
-                            .requestMatchers(PathRequest.toH2Console()).permitAll()
+                            // .requestMatchers(PathRequest.toH2Console()).permitAll()
                             .requestMatchers("/**").authenticated();
                 })
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -1,3 +1,5 @@
+use lsearch
+
 CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER AUTO_INCREMENT PRIMARY KEY,
     "providerId" VARCHAR(100) NOT NULL,

@@ -7,7 +7,6 @@ import org.apache.coyote.BadRequestException;
 import org.lsearch.LRequest.dto.user.PatchUserDto;
 import org.lsearch.LRequest.dto.user.RegisterUserDto;
 import org.lsearch.LRequest.interfaces.AuthAspect;
-import org.lsearch.LRequest.interfaces.CurrentUser;
 import org.lsearch.LRequest.models.User;
 import org.lsearch.LRequest.services.UserService;
 import org.lsearch.LRequest.utils.UserContextHolder;
@@ -38,7 +37,7 @@ public class UserController extends BaseController{
 
     @PatchMapping("/me")
     @AuthAspect
-    public void patchProfile(@RequestBody @Valid PatchUserDto userDto, Errors errors) throws BadRequestException {
+    public User patchProfile(@RequestBody @Valid PatchUserDto userDto, Errors errors) throws BadRequestException {
         // TODO: Move to aspect
         this.processErrors(errors);
 
@@ -47,11 +46,11 @@ public class UserController extends BaseController{
         }
 
         var user  = UserContextHolder.getUser();
-        this.userService.updateUser(user.getId(), userDto);
+        return this.userService.updateUser(user, userDto.getName(), userDto.getEmail());
     }
 
     @PostMapping("/register")
-    public void register(@RequestBody @Valid RegisterUserDto userDto, Errors errors) throws BadRequestException {
+    public User register(@RequestBody @Valid RegisterUserDto userDto, Errors errors) throws BadRequestException {
         // TODO: Move to aspect
         this.processErrors(errors);
 
@@ -59,6 +58,6 @@ public class UserController extends BaseController{
             throw new BadCredentialsException("Webhook key is missing");
         }
 
-        this.userService.register(userDto);
+        return this.userService.register(userDto);
     }
 }

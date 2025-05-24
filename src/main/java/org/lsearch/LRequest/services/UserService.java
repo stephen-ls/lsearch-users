@@ -2,21 +2,18 @@ package org.lsearch.LRequest.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.lsearch.LRequest.dto.user.PatchUserDto;
 import org.lsearch.LRequest.dto.user.RegisterUserDto;
-import org.lsearch.LRequest.enums.UserRole;
+import org.lsearch.LRequest.exceptions.ResourceNotFoundException;
 import org.lsearch.LRequest.models.User;
 import org.lsearch.LRequest.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
-import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.web.context.annotation.SessionScope;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -86,26 +83,41 @@ public class UserService {
         return names.get(index) + "." + timestamp;
     }
 
-    public boolean register(RegisterUserDto userDto) {
-        var providerId = userDto.getProviderId();
-        var user = userRepository.getUserByProviderId(providerId);
-        if (user == null) {
-            user = new User();
-            user.setName(getRandomName());
-            user.setProviderId(providerId);
-            user.setEmail(userDto.getEmail());
-            user.setRole(UserRole.USER);
-            user.setCreatedAt(LocalDateTime.now());
-            user.setUpdatedAt(LocalDateTime.now());
-            int result = userRepository.createUser(user);
-            return result > 0;
-        }
-
-        return true;
+    public User getUserById(UUID id) {
+        var userOpt = userRepository.findById(id);
+        return userOpt.orElse(null);
     }
 
-    public boolean updateUser(int id, PatchUserDto userDto) {
-        int result = userRepository.updateUser(id, userDto.getName(), userDto.getEmail());
-        return result > 0;
+    public User getUserByProviderId(String providerId) {
+        var userOpt = userRepository.findByProviderId(providerId);
+        return userOpt.orElse(null);
+    }
+
+    public User register(RegisterUserDto userDto) {
+        var providerId = userDto.getProviderId();
+        var user = this.getUserByProviderId(providerId);
+        if (user == null) {
+            user = new User(providerId, userDto.getEmail(), getRandomName());
+            return userRepository.save(user);
+        }
+
+        return user;
+    }
+
+    public User updateUser(UUID id, PatchUserDto userDto) {
+        User user = this.getUserById(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        return this.updateUser(user, userDto.getName(), userDto.getEmail());
+    }
+
+    public User updateUser(User user, String name, String email) {
+        if (name != null) user.setName(name);
+        if (email != null) user.setName(name);
+        userRepository.save(user);
+
+        return user;
     }
 }

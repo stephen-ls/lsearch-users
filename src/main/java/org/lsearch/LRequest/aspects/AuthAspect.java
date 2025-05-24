@@ -1,15 +1,12 @@
 package org.lsearch.LRequest.aspects;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Before;
-import org.lsearch.LRequest.enums.UserRole;
 import org.lsearch.LRequest.exceptions.ResourceNotFoundException;
 import org.lsearch.LRequest.exceptions.UnauthenticatedException;
-import org.lsearch.LRequest.repositories.UserRepository;
+import org.lsearch.LRequest.services.UserService;
 import org.lsearch.LRequest.utils.UserContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,7 +19,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 @RequiredArgsConstructor
 public class AuthAspect {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Before("@annotation(org.lsearch.LRequest.interfaces.AuthAspect)")
     public void loadUser(JoinPoint joinPoint) throws Throwable {
@@ -32,7 +29,7 @@ public class AuthAspect {
         }
 
         String providerId = principal.getSubject();
-        var user = userRepository.getUserByProviderId(providerId);
+        var user = userService.getUserByProviderId(providerId);;
         if (user == null) {
             throw new ResourceNotFoundException("User not found");
         }
